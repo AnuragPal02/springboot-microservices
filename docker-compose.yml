@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    networks:
+      - microservices-network
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    ports:
+      - "5002:5002"
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build: ./api-gateway1   
+    container_name: api-gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - auth-service
+      - product-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
