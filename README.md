@@ -1,304 +1,156 @@
-\# Spring Boot Microservices – E-Commerce Demo
+# Spring Boot Microservices — Dockerized
 
+This project demonstrates a simple microservices architecture built using Spring Boot and secured with JWT authentication.
 
+The system is composed of three independent services:
 
-\## Overview
+• **API Gateway** — entry point for all client requests
+• **Auth Service** — handles user authentication and token generation
+• **Product Service** — protected business APIs
 
-
-
-This project demonstrates a simple microservices architecture using Spring Boot.
-
-
-
-The system consists of three independent services:
-
-
-
-\* \*\*API Gateway\*\* – Entry point for all client requests
-
-\* \*\*Auth Service\*\* – Handles authentication and JWT token validation
-
-\* \*\*Product Service\*\* – Provides product related APIs
-
-
-
-All requests first pass through the Gateway → validated by Auth → forwarded to Product service.
-
-
+All client traffic flows through the Gateway, which validates the JWT token before forwarding requests to downstream services.
 
 ---
 
-
-
-\## Architecture Flow
-
-
+## Architecture Flow
 
 Client → API Gateway → Auth Service → Product Service
 
+---
 
+## Tech Stack
 
-The API Gateway routes requests and verifies JWT authentication before allowing access to protected endpoints.
-
-
+Java 17
+Spring Boot
+Spring Security
+JWT Authentication
+REST APIs
+Maven
+Docker
+Docker Compose
 
 ---
 
+## Running the Project (Without Docker)
 
+Open three terminals.
 
-\## Technologies Used
+Start Auth Service:
+cd auth-service
+mvn spring-boot:run
 
+Start Product Service:
+cd product-service
+mvn spring-boot:run
 
-
-\* Java 17
-
-\* Spring Boot
-
-\* Spring Cloud Gateway
-
-\* JWT Authentication
-
-\* Maven
-
-\* REST APIs
-
-
+Start API Gateway:
+cd api-gateway1
+mvn spring-boot:run
 
 ---
 
+## Running the Project (With Docker)
 
+### Prerequisites
 
-\## Running the Project
+Install Docker Desktop
 
+Verify installation:
+docker --version
+docker compose version
 
-
-\### 1. Clone Repository
-
-
-
-```
-
-git clone https://github.com/AnuragPal02/springboot-microservices.git
-
-cd springboot-microservices
-
-```
-
-
-
-\### 2. Start Services (run in order)
-
-
-
-Open 3 terminals:
-
-
-
-\#### Start Auth Service
-
-
-
-```
+### Step 1 — Build JAR files
 
 cd auth-service
+mvn clean package
 
-mvn spring-boot:run
+cd ../product-service
+mvn clean package
 
-```
+cd ../api-gateway1
+mvn clean package
 
+### Step 2 — Start all services
 
+From project root folder:
+docker compose up --build
 
-\#### Start Product Service
+This command will:
+• Build images
+• Create containers
+• Connect services via network
+• Start the full system
 
+### Step 3 — Stop services
 
-
-```
-
-cd product-service
-
-mvn spring-boot:run
-
-```
-
-
-
-\#### Start API Gateway
-
-
-
-```
-
-cd api-gateway1
-
-mvn spring-boot:run
-
-```
-
-
+docker compose down
 
 ---
 
+## Default Ports
 
-
-\## Default Ports
-
-
-
-| Service         | Port |
-
-| --------------- | ---- |
-
-| Auth Service    | 5001 |
-
-| Product Service | 5002 |
-
-| API Gateway     | 5000 |
-
-
+API Gateway — 5000
+Auth Service — 5001
+Product Service — 5002
 
 ---
 
+## API Usage
 
+### Register User
 
-\## API Usage
+POST http://localhost:5000/auth/register
 
+### Login (Get Token)
 
-
-\### 1. Login (Generate Token)
-
-
-
-POST
-
-
-
-```
-
-http://localhost:5001/auth/login
-
-```
-
-
+POST http://localhost:5000/auth/login
 
 Body:
-
-
-
-```
-
 {
-
-&nbsp; "username": "user",
-
-&nbsp; "password": "password"
-
+"email": "[user@test.com](mailto:user@test.com)",
+"password": "password123"
 }
 
-```
+### Access Protected API
 
-
-
-Returns JWT token.
-
-
-
----
-
-
-
-\### 2. Access Protected Product API
-
-
-
-GET
-
-
-
-```
-
-http://localhost:5000/products
-
-```
-
-
+GET http://localhost:5000/products
 
 Header:
-
-
-
-```
-
-Authorization: Bearer <your\_token>
-
-```
+Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-
-
-\## API Documentation (Swagger UI)
-
-
-
-Interactive API documentation is available once services are running:
-
-
-
-Auth Service Swagger:
-
-http://localhost:5001/swagger-ui.html
-
-
-
-Product Service Swagger:
-
-http://localhost:5002/swagger-ui.html
-
-
-
-Api-gateway Swagger: 
+## Swagger Documentation
 
 http://localhost:5000/swagger-ui.html
-
-
-
-Using Swagger, you can test APIs directly from the browser without Postman.
-
-JWT token generated from login can be pasted into the Authorize button to access protected endpoints.
-
-
+http://localhost:5001/swagger-ui.html
+http://localhost:5002/swagger-ui.html
 
 ---
 
+## Docker Networking
 
+Inside Docker, services communicate using container names instead of localhost:
 
-\## Purpose
+auth-service
+product-service
 
-
-
-This project demonstrates:
-
-
-
-\* Microservices communication
-
-\* API Gateway routing
-
-\* JWT based authentication
-
-\* Service separation \& scalability design
-
-
+Gateway internally routes to:
+http://auth-service:5001
+http://product-service:5002
 
 ---
 
+## Concepts Demonstrated
 
+Microservice communication
+API Gateway routing
+JWT authentication
+Containerized deployment
+Service orchestration
 
-\## Author
+---
 
-
+## Author
 
 Anurag Pal
-
-
-
